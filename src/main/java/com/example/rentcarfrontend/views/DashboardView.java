@@ -1,26 +1,67 @@
 package com.example.rentcarfrontend.views;
 
+import com.example.rentcarfrontend.dto.UserDto;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 @Route("dashboard")
 public class DashboardView extends VerticalLayout {
 
     private Button rentCarButton = new Button("Rent a car");
+    private Button rentsButton = new Button("Rents");
+
+    private VaadinSession vaadinSession;
+    private HorizontalLayout topLayout = new HorizontalLayout();
+
+    private UserDto user;
+    private Label welcomeLabel = new Label();
+
+    private Button loginPageButton;
+    private Label loginPageLabel;
+
+    private Button logoutButton;
 
     public DashboardView(){
-        HorizontalLayout dashboardLayout = new HorizontalLayout();
-        dashboardLayout.setPadding(true);
-        dashboardLayout.setHeightFull();
-        dashboardLayout.setSizeFull();
-        dashboardLayout.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
-        dashboardLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        dashboardLayout.add(rentCarButton);
-        dashboardLayout.add(new Button("Rents"));
-        dashboardLayout.add(new Button("Account"));
+        vaadinSession = VaadinSession.getCurrent();
+        loginPageButton = new Button("Move to login page");
+        loginPageLabel = new Label("You are not logged in!");
+        logoutButton = new Button("Logout");
+        VerticalLayout logInLayout = new VerticalLayout();
+        logInLayout.add(loginPageLabel, loginPageButton);
+
+        if (vaadinSession.getAttribute("userId") != null){
+            user = (UserDto) vaadinSession.getAttribute("userId");
+
+            logoutButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+
+
+            welcomeLabel.setText("Welcome back " + user.getUsername());
+            topLayout.add(welcomeLabel, logoutButton);
+            HorizontalLayout dashboardLayout = new HorizontalLayout();
+            dashboardLayout.setPadding(true);
+            dashboardLayout.setHeightFull();
+            dashboardLayout.setSizeFull();
+            dashboardLayout.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
+            dashboardLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+            dashboardLayout.add(rentCarButton);
+            dashboardLayout.add(rentsButton);
+            dashboardLayout.add(new Button("Account"));
+            add(topLayout);
+            add(dashboardLayout);
+        }else {
+            logInLayout.setSizeFull();
+            logInLayout.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
+            logInLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+            add(logInLayout);
+        }
+
+
 
 
         rentCarButton.addClickListener(e ->
@@ -28,8 +69,23 @@ public class DashboardView extends VerticalLayout {
                     ui.navigate("rent-car"))
         );
 
-        add(dashboardLayout);
+        rentsButton.addClickListener(e ->
+                rentsButton.getUI().ifPresent(ui ->
+                        ui.navigate("rents"))
+        );
 
+        loginPageButton.addClickListener(event -> {
+            loginPageButton.getUI().ifPresent(ui -> {
+                ui.navigate("login");
+            });
+        });
+
+        logoutButton.addClickListener(event -> {
+            logoutButton.getUI().ifPresent(ui -> {
+                vaadinSession.setAttribute("userId", null);
+                ui.navigate("login");
+            });
+        });
 
     }
 

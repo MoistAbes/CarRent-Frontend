@@ -1,6 +1,9 @@
 package com.example.rentcarfrontend.cars;
 
+import com.example.rentcarfrontend.client.RentClient;
+import com.example.rentcarfrontend.client.RentedCarClient;
 import com.example.rentcarfrontend.domain.Car;
+import com.example.rentcarfrontend.dto.UserDto;
 import com.example.rentcarfrontend.service.CarReviewService;
 import com.example.rentcarfrontend.views.RentCarView;
 import com.vaadin.flow.component.button.Button;
@@ -10,13 +13,20 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.VaadinSession;
 
 public class CarForm extends FormLayout {
 
+    private VaadinSession vaadinSession = VaadinSession.getCurrent();
+    private UserDto userDto;
+
     private RentCarView rentCarView;
     private CarReviewService carReviewService;
+    private RentedCarClient rentedCarClient;
+    private RentClient rentClient;
 
 
     DatePicker rentFrom = new DatePicker("Rent from:");
@@ -27,25 +37,42 @@ public class CarForm extends FormLayout {
     private Label reviewLabel = new Label("Review");
     private Label review = new Label();
 
-    //private Binder<Car> binder = new Binder<Car>(Car.class);
 
 
     public CarForm(RentCarView rentCarView){
 
+        userDto = (UserDto) vaadinSession.getAttribute("userId");
+
         carReviewService = new CarReviewService();
+        rentedCarClient = new RentedCarClient();
+        rentClient = new RentClient();
 
 
         HorizontalLayout buttons = new HorizontalLayout(rentButton);
         VerticalLayout reviewLayout = new VerticalLayout(reviewLabel, review);
         rentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         add(rentFrom, rentTo, buttons, reviewLayout);
-        //binder.bindInstanceFields(this);
         this.rentCarView = rentCarView;
-        rentButton.addClickListener(event -> save());
+        rentButton.addClickListener(event -> {
+            saveRent((Car) vaadinSession.getAttribute("rentedCar"));
+            Notification.show("Successfully rented car");
+        });
     }
 
-    private void save() {
+    private void saveRent(Car car) {
+        Long rentedCarId = rentedCarClient.createRentedCar(car.getYear(), car.getBrand(), car.getModel(), car.getType());
 
+
+        System.out.println("Rent info: " + " User id: " + userDto.getId());
+        System.out.println(" rentedCarId: " + rentedCarId );
+        System.out.println(" Rent from: " + rentFrom.getValue());
+        System.out.println(" Rent to: " + rentTo.getValue());
+
+        rentClient.createRent(
+                userDto.getId(),
+                rentedCarId,
+                rentFrom.getValue(),
+                rentTo.getValue());
     }
 
     public void setReview(String search){

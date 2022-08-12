@@ -1,24 +1,21 @@
 package com.example.rentcarfrontend.views;
 
-import com.example.rentcarfrontend.dto.UserDto;
+import com.example.rentcarfrontend.client.UserClient;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
 
 @Route("register")
 public class RegisterView extends VerticalLayout {
 
-    RestTemplate restTemplate = new RestTemplate();
-
+    UserClient userClient = new UserClient();
     Button registerButton = new Button("Register");
+    Button loginButton = new Button("Already got account? Log in here!");
 
     Paragraph registerParagraph = new Paragraph("Register");
 
@@ -32,51 +29,31 @@ public class RegisterView extends VerticalLayout {
     public RegisterView(){
 
 
+
         registerButton.addClickListener(e ->{
-            createUser(firstNameField.getValue(), lastNameField.getValue(), userNameField.getValue(), passwordField.getValue());
-            //trzeba bedzie dodac weryfikacje poprawnej rejestracji
-            //do zmian
-            registerButton.getUI().ifPresent(ui ->
-                    ui.navigate("dashboard"));
+            if  (userClient.createUser(firstNameField.getValue(), lastNameField.getValue(), userNameField.getValue(), passwordField.getValue())) {
+                Notification.show("Registration successful");
+                registerButton.getUI().ifPresent(ui ->
+                        ui.navigate("login"));
+            }else {
+                Notification.show("Username is taken");
+            }
+
+        });
+
+        loginButton.addClickListener(event -> {
+            loginButton.getUI().ifPresent(ui -> {
+                ui.navigate("login");
+            });
         });
 
 
-        VerticalLayout loginContent = new VerticalLayout(registerParagraph, firstNameField, lastNameField, userNameField, passwordField, registerButton);
+        VerticalLayout loginContent = new VerticalLayout(registerParagraph, firstNameField, lastNameField, userNameField, passwordField, registerButton, loginButton);
         loginContent.setSizeFull();
         loginContent.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
         loginContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         add(loginContent);
 
     }
-
-    /*
-    testowy button
-    public void getUser(){
-        String fooResourceUrl
-                = "http://localhost:8083/v1/users";
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(fooResourceUrl + "/27", String.class);
-
-
-        System.out.println("USER: " + response + " :USER");
-    }
-
-     */
-
-    public void createUser(String firstname, String surname, String username, String password){
-        UserDto userDto = new UserDto(firstname, surname, username, password);
-
-        URI url = UriComponentsBuilder.fromHttpUrl("http://localhost:8083/v1/users")
-                .build()
-                .encode()
-                .toUri();
-
-
-        restTemplate.postForObject(url, userDto, UserDto.class);
-
-    }
-
-
-
 
 }

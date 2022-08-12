@@ -1,36 +1,57 @@
 package com.example.rentcarfrontend.views;
 
-
-import com.vaadin.flow.component.html.Label;
+import com.example.rentcarfrontend.client.UserClient;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-@Route
+@Route("login")
 public class LoginView extends VerticalLayout {
 
-    LoginForm loginForm = new LoginForm();
-    HorizontalLayout labelLayout = new HorizontalLayout();
+    UserClient userClient = new UserClient();
+
+    Button logInButton = new Button("Log in");
+    Button registerButton = new Button("Don't have accout? Register here!");
+
+    Paragraph logInPage = new Paragraph("Log in page");
+
+    TextField userNameField = new TextField("Username", "", "");
+    PasswordField passwordField = new PasswordField("Password", "");
 
 
     public LoginView(){
 
-        labelLayout.add(new Label("Don't have account? Click here!"));
-        labelLayout.addClickListener( e ->
-                labelLayout.getUI().ifPresent(ui ->
-                        ui.navigate("register"))
-        );
 
-        VerticalLayout registerContent = new VerticalLayout(loginForm, labelLayout);
-        registerContent.setSizeFull();
-        registerContent.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
-        registerContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        VerticalLayout loginContent = new VerticalLayout(logInPage, userNameField, passwordField,logInButton, registerButton );
+        loginContent.setSizeFull();
+        loginContent.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
+        loginContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        add(loginContent);
 
 
-        add(registerContent);
+        logInButton.addClickListener(e ->{
+            if  (userClient.authenticate(userNameField.getValue(), passwordField.getValue())) {
+                Notification.show("Log in successful");
+                logInButton.getUI().ifPresent(ui ->
+                        ui.navigate("dashboard"));
+            }else {
+                Notification.show("Wrong username or password");
+            }
+
+        });
+
+        registerButton.addClickListener(event -> {
+            registerButton.getUI().ifPresent(ui -> {
+                ui.navigate("register");
+            });
+        });
+
+
 
     }
 }
