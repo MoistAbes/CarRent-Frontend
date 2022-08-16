@@ -1,11 +1,14 @@
 package com.example.rentcarfrontend.client;
 
+import com.example.rentcarfrontend.dto.RentDto;
 import com.example.rentcarfrontend.dto.UserDto;
 import com.example.rentcarfrontend.service.CarService;
 import com.vaadin.flow.server.VaadinSession;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -65,9 +68,19 @@ public class UserClient {
                     return false;
                 }
             }
-
             return false;
+    }
 
+    public void updateUser(UserDto userDto){
+        URI url = UriComponentsBuilder.fromHttpUrl("http://localhost:8083/v1/users")
+                .build()
+                .encode()
+                .toUri();
+
+        HttpEntity<UserDto> requestEntity = new HttpEntity<>(userDto);
+
+        HttpEntity<UserDto> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, UserDto.class);
+        System.out.println("Updated user response: " + response.getBody());
     }
 
 }

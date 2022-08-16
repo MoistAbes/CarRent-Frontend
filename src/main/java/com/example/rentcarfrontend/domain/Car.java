@@ -3,8 +3,10 @@ package com.example.rentcarfrontend.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Car {
@@ -15,22 +17,9 @@ public class Car {
     private String brand;
     private String model;
     private String type;
+    private RentedCarStatus status;
 
-    public int getYear() {
-        return year;
-    }
 
-    public String getBrand() {
-        return brand;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public String getType() {
-        return type;
-    }
 
     public void setYear(int year) {
         this.year = year;

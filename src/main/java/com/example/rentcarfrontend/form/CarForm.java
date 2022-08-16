@@ -1,4 +1,4 @@
-package com.example.rentcarfrontend.cars;
+package com.example.rentcarfrontend.form;
 
 import com.example.rentcarfrontend.client.RentClient;
 import com.example.rentcarfrontend.client.RentedCarClient;
@@ -9,10 +9,8 @@ import com.example.rentcarfrontend.views.RentCarView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -61,12 +59,6 @@ public class CarForm extends FormLayout {
 
     private void saveRent(Car car) {
         Long rentedCarId = rentedCarClient.createRentedCar(car.getYear(), car.getBrand(), car.getModel(), car.getType());
-
-
-        System.out.println("Rent info: " + " User id: " + userDto.getId());
-        System.out.println(" rentedCarId: " + rentedCarId );
-        System.out.println(" Rent from: " + rentFrom.getValue());
-        System.out.println(" Rent to: " + rentTo.getValue());
 
         rentClient.createRent(
                 userDto.getId(),

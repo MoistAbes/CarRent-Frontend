@@ -1,10 +1,7 @@
 package com.example.rentcarfrontend.service;
 
-import com.example.rentcarfrontend.books.Book;
-import com.example.rentcarfrontend.books.BookService;
 import com.example.rentcarfrontend.domain.Car;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,7 +9,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @NoArgsConstructor

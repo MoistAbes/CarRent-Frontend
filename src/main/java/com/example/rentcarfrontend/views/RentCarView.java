@@ -1,6 +1,6 @@
 package com.example.rentcarfrontend.views;
 
-import com.example.rentcarfrontend.cars.CarForm;
+import com.example.rentcarfrontend.form.CarForm;
 import com.example.rentcarfrontend.domain.Car;
 import com.example.rentcarfrontend.dto.UserDto;
 import com.example.rentcarfrontend.service.CarService;
@@ -8,7 +8,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
@@ -27,6 +26,8 @@ public class RentCarView extends VerticalLayout {
     private Button loginPageButton;
     private Label loginPageLabel;
 
+    private Label titleLabel;
+
     public RentCarView(){
 
         vaadinSession = VaadinSession.getCurrent();
@@ -37,12 +38,15 @@ public class RentCarView extends VerticalLayout {
         logInLayout.add(loginPageLabel, loginPageButton);
 
         if (vaadinSession.getAttribute("userId") != null){
+
+            titleLabel = new Label("Cars");
+
             grid.setColumns("year", "brand", "model", "type");
             VerticalLayout gridLayout = new VerticalLayout(grid);
             VerticalLayout formLayout = new VerticalLayout(form);
 
             gridLayout.setSizeFull();
-            add(gridLayout, formLayout);
+            add(titleLabel, gridLayout, formLayout);
             setSizeFull();
             form.setCar(null);
 

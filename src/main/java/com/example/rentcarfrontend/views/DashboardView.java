@@ -15,9 +15,11 @@ public class DashboardView extends VerticalLayout {
 
     private Button rentCarButton = new Button("Rent a car");
     private Button rentsButton = new Button("Rents");
+    private Button accountButton = new Button("Account");
 
     private VaadinSession vaadinSession;
-    private HorizontalLayout topLayout = new HorizontalLayout();
+    private HorizontalLayout logoutButtonLayout = new HorizontalLayout();
+    private HorizontalLayout dashBoardLayout = new HorizontalLayout();
 
     private UserDto user;
     private Label welcomeLabel = new Label();
@@ -41,19 +43,23 @@ public class DashboardView extends VerticalLayout {
             logoutButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
 
-            welcomeLabel.setText("Welcome back " + user.getUsername());
-            topLayout.add(welcomeLabel, logoutButton);
-            HorizontalLayout dashboardLayout = new HorizontalLayout();
+            logoutButtonLayout.add(logoutButton);
+            logoutButtonLayout.setJustifyContentMode(JustifyContentMode.END);
+            welcomeLabel.setText("Dashboard");
+            VerticalLayout dashboardLayout = new VerticalLayout();
+
+            logoutButtonLayout.setSizeFull();
+
             dashboardLayout.setPadding(true);
             dashboardLayout.setHeightFull();
             dashboardLayout.setSizeFull();
             dashboardLayout.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
-            dashboardLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+            dashboardLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+            dashboardLayout.add(welcomeLabel);
             dashboardLayout.add(rentCarButton);
             dashboardLayout.add(rentsButton);
-            dashboardLayout.add(new Button("Account"));
-            add(topLayout);
-            add(dashboardLayout);
+            dashboardLayout.add(accountButton);
+            add(logoutButtonLayout,dashboardLayout);
         }else {
             logInLayout.setSizeFull();
             logInLayout.setJustifyContentMode ( FlexComponent.JustifyContentMode.CENTER );
@@ -73,6 +79,12 @@ public class DashboardView extends VerticalLayout {
                 rentsButton.getUI().ifPresent(ui ->
                         ui.navigate("rents"))
         );
+
+        accountButton.addClickListener(event -> {
+            accountButton.getUI().ifPresent(ui -> {
+                ui.navigate("account");
+            });
+        });
 
         loginPageButton.addClickListener(event -> {
             loginPageButton.getUI().ifPresent(ui -> {

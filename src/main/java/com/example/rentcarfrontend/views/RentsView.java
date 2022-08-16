@@ -6,6 +6,7 @@ import com.example.rentcarfrontend.domain.RentListElement;
 import com.example.rentcarfrontend.dto.RentDto;
 import com.example.rentcarfrontend.dto.RentedCarDto;
 import com.example.rentcarfrontend.dto.UserDto;
+import com.example.rentcarfrontend.form.RentForm;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
@@ -32,6 +33,7 @@ public class RentsView extends VerticalLayout {
     private RentedCarClient rentedCarClient = new RentedCarClient();
 
     private Grid<RentListElement> grid = new Grid<>(RentListElement.class);
+    private RentForm form = new RentForm(this);
 
     private UserDto userInfo;
 
@@ -46,6 +48,10 @@ public class RentsView extends VerticalLayout {
         loginPageLabel = new Label("You are not logged in!");
         VerticalLayout logInLayout = new VerticalLayout();
         logInLayout.add(loginPageLabel, loginPageButton);
+        HorizontalLayout mainContent = new HorizontalLayout(grid, form);
+        mainContent.setSizeFull();
+        grid.setSizeFull();
+
 
         if (vaadinSession.getAttribute("userId") != null){
             userInfo = (UserDto) vaadinSession.getAttribute("userId");
@@ -53,13 +59,24 @@ public class RentsView extends VerticalLayout {
             HorizontalLayout titleLayout = new HorizontalLayout(titleLabel);
 
             grid.setColumns("year", "brand", "model", "type", "rentFrom", "rentTo");
-            VerticalLayout gridLayout = new VerticalLayout(grid);
 
-            gridLayout.setSizeFull();
-            add(titleLayout, gridLayout);
+            add(titleLayout, mainContent);
             setSizeFull();
+            form.setRentListElement(null);
 
             refresh();
+
+            grid.asSingleSelect().addValueChangeListener(event -> {
+                form.setRentListElement(grid.asSingleSelect().getValue());
+                vaadinSession.setAttribute("rent", new RentDto(
+                        grid.asSingleSelect().getValue().getRentId(),
+                        grid.asSingleSelect().getValue().getUserId(),
+                        grid.asSingleSelect().getValue().getRentedCarId(),
+                        grid.asSingleSelect().getValue().getRentFrom(),
+                        grid.asSingleSelect().getValue().getRentTo()
+                ));
+            });
+
 
         }else {
             logInLayout.setSizeFull();
@@ -84,6 +101,9 @@ public class RentsView extends VerticalLayout {
                 .collect(Collectors.toList());
 
         List<RentListElement> rentListElements = createRentListElements(responseRentList, rentedCarList);
+        for (RentListElement rentListElement : rentListElements){
+            System.out.println(rentListElement);
+        }
 
 
         grid.setItems(rentListElements);
@@ -100,15 +120,20 @@ public class RentsView extends VerticalLayout {
         }
 
         for (Map.Entry<RentDto, RentedCarDto> entry : rentsAndRenterCarsMap.entrySet()) {
-            resultList.add(new RentListElement(
-                    entry.getValue().getYear(),
-                    entry.getValue().getBrand(),
-                    entry.getValue().getModel(),
-                    entry.getValue().getType(),
-                    entry.getKey().getRentFrom(),
-                    entry.getKey().getRentTo())
-            );
-            System.out.println(entry.getKey() + ":" + entry.getValue());
+
+            RentListElement rentListElement = new RentListElement.RentListElementBuilder()
+                    .rentId(entry.getKey().getId())
+                    .userId(entry.getKey().getUserId())
+                    .rentedCarId( entry.getKey().getRentedCarId())
+                    .year(entry.getValue().getYear())
+                    .brand(entry.getValue().getBrand())
+                    .model(entry.getValue().getModel())
+                    .type(entry.getValue().getType())
+                    .rentFrom(entry.getKey().getRentFrom())
+                    .rentTo(entry.getKey().getRentTo())
+                    .build();
+
+            resultList.add(rentListElement);
         }
         return resultList;
     }
